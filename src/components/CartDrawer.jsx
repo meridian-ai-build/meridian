@@ -111,51 +111,63 @@ export default function CartDrawer({ cart, onClose, onRemove, user }) {
 }
 
 function CartItem({ item, onRemove }) {
-  const size = POSTER_SIZES.find(s => s.id === item.sizeId);
   const printType = PRINT_TYPES.find(p => p.id === item.printType);
-  const frame = FRAME_OPTIONS.find(f => f.id === item.frameId);
-  const orientationLabel = item.orientation === 'landscape' ? 'Landscape' : 'Portrait';
+  const frame     = FRAME_OPTIONS.find(f => f.id === item.frameId);
+  const isSingle  = item.type === 'single-print';
+
+  // Thumbnail dimensions
+  const tw = isSingle ? 36 : (item.orientation === 'landscape' ? 52 : 40);
+  const th = isSingle ? 48 : (item.orientation === 'landscape' ? 40 : 52);
 
   return (
     <div className="px-6 py-4 flex gap-4">
-      {/* Mini poster thumbnail */}
+      {/* Mini thumbnail */}
       <div
-        className="flex-shrink-0 rounded-sm flex items-center justify-center"
+        className="flex-shrink-0 rounded-sm overflow-hidden relative"
         style={{
-          width: item.orientation === 'landscape' ? 52 : 40,
-          height: item.orientation === 'landscape' ? 40 : 52,
+          width: tw, height: th,
           backgroundColor: item.themeColors?.posterBg ?? '#0d1117',
           border: `1px solid ${item.themeColors?.posterBorder ?? '#d4af3740'}`,
         }}
       >
-        <div className="w-full h-full opacity-60 flex flex-col items-center justify-center gap-0.5 px-1">
-          <div className="w-full h-px" style={{ backgroundColor: item.themeColors?.posterAccent ?? '#d4af37', opacity: 0.5 }} />
-          <div className="rounded-full" style={{ width: 4, height: 4, backgroundColor: item.themeColors?.pinColor ?? '#d4af37', opacity: 0.8 }} />
-        </div>
+        {isSingle && item.photoUrl ? (
+          <img src={item.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ opacity: 0.7 }} />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 px-1">
+            <div className="w-full h-px" style={{ backgroundColor: item.themeColors?.posterAccent ?? '#d4af37', opacity: 0.5 }} />
+            <div className="rounded-full" style={{ width: 3, height: 3, backgroundColor: item.themeColors?.posterAccent ?? '#d4af37', opacity: 0.7 }} />
+          </div>
+        )}
       </div>
 
       {/* Details */}
       <div className="flex-1 min-w-0">
-        <p className="text-white/80 text-sm font-inter font-medium truncate">{item.title}</p>
-        <p className="text-white/35 text-[11px] font-inter mt-0.5">
-          {size?.label} · {orientationLabel}
-        </p>
-        <p className="text-white/35 text-[11px] font-inter">{printType?.label}</p>
-        {frame && frame.id !== 'none' && (
-          <p className="text-white/35 text-[11px] font-inter">{frame.label} frame</p>
+        <p className="text-white/80 text-sm font-inter font-medium truncate">{item.title || 'Untitled'}</p>
+        {isSingle ? (
+          <>
+            <p className="text-white/35 text-[11px] font-inter mt-0.5 capitalize">{item.style} style</p>
+            {item.region && <p className="text-white/30 text-[11px] font-inter truncate">{item.region}</p>}
+          </>
+        ) : (
+          <>
+            <p className="text-white/35 text-[11px] font-inter mt-0.5">
+              {POSTER_SIZES.find(s => s.id === item.sizeId)?.label} · {item.orientation === 'landscape' ? 'Landscape' : 'Portrait'}
+            </p>
+            <p className="text-white/30 text-[11px] font-inter">
+              {item.locations?.length ?? 0} location{(item.locations?.length ?? 0) !== 1 ? 's' : ''}
+            </p>
+          </>
         )}
-        <p className="text-white/30 text-[11px] font-inter mt-1">
-          {item.locations.length} location{item.locations.length !== 1 ? 's' : ''}
-        </p>
+        <p className="text-white/30 text-[11px] font-inter">{printType?.label}</p>
+        {frame && frame.id !== 'none' && (
+          <p className="text-white/30 text-[11px] font-inter">{frame.label} frame</p>
+        )}
       </div>
 
       {/* Price + Remove */}
       <div className="flex flex-col items-end justify-between flex-shrink-0">
         <span className="text-white/70 text-sm font-inter">${item.price}</span>
-        <button
-          onClick={onRemove}
-          className="text-white/20 hover:text-red-400/60 text-[11px] font-inter transition-colors"
-        >
+        <button onClick={onRemove} className="text-white/20 hover:text-red-400/60 text-[11px] font-inter transition-colors">
           Remove
         </button>
       </div>

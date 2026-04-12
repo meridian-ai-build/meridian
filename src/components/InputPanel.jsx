@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { POSTER_SIZES } from '../utils/posterSizes';
 import { MAP_FOCUSES } from '../utils/mapFocuses';
 import { PRINT_TYPES, FRAME_OPTIONS } from '../utils/pricing';
@@ -42,23 +43,24 @@ export default function InputPanel({
   return (
     <aside className="w-80 h-full flex flex-col bg-[#111118] border-r border-white/[0.06] overflow-y-auto sidebar-scroll flex-shrink-0">
       {/* Logo */}
-      <div className="px-6 pt-4 pb-3 border-b border-white/[0.06] flex items-center justify-between">
-        <div className="flex items-baseline gap-3">
-          <span className="font-playfair text-xl font-semibold tracking-[0.12em] text-white">
-            MERIDIAN
-          </span>
-          <span className="text-[10px] tracking-[0.25em] text-white/30 font-inter uppercase">
-            Poster Studio
-          </span>
+      <div className="px-5 pt-3 pb-3 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between mb-2">
+          <Link to="/" className="flex items-center gap-1.5 text-white/20 hover:text-white/45 transition-colors text-[10px] font-inter tracking-wide">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M19 12H5m7-7-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Home
+          </Link>
+          {hasLocations && (
+            <button onClick={onClear} className="text-[10px] text-white/25 hover:text-white/50 font-inter tracking-wide transition-colors">
+              Clear all
+            </button>
+          )}
         </div>
-        {hasLocations && (
-          <button
-            onClick={onClear}
-            className="text-[10px] text-white/25 hover:text-white/50 font-inter tracking-wide transition-colors"
-          >
-            Clear all
-          </button>
-        )}
+        <div className="flex items-baseline gap-3">
+          <span className="font-playfair text-xl font-semibold tracking-[0.12em] text-white">MERIDIAN</span>
+          <span className="text-[10px] tracking-[0.25em] text-white/30 font-inter uppercase">Travel Map</span>
+        </div>
       </div>
 
       <div className="flex-1 px-6 pt-3 pb-2 space-y-4 overflow-y-auto sidebar-scroll">

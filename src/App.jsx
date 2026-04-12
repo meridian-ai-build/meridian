@@ -9,6 +9,7 @@ import { DEFAULT_SIZE_ID } from './utils/posterSizes';
 import { DEFAULT_FOCUS_ID, getFocusById } from './utils/mapFocuses';
 import { FRAME_SHADOWS, calculatePrice } from './utils/pricing';
 import { supabase } from './utils/supabase';
+import { useCart } from './context/CartContext';
 
 export default function App() {
   const [title, setTitle] = useState('My Travels');
@@ -26,9 +27,8 @@ export default function App() {
   const [frameId, setFrameId] = useState('none');
   const [error, setError] = useState('');
 
-  // Cart & auth
-  const [cart, setCart] = useState([]);
-  const [cartOpen, setCartOpen] = useState(false);
+  // Cart (shared via context) + auth
+  const { cart, cartOpen, setCartOpen, addToCart, removeFromCart } = useCart();
   const [authOpen, setAuthOpen] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -72,8 +72,8 @@ export default function App() {
       return;
     }
     const price = calculatePrice(printType, frameId);
-    const item = {
-      id: Date.now(),
+    addToCart({
+      type: 'travel-map',
       title,
       subtitle,
       sizeId,
@@ -90,14 +90,12 @@ export default function App() {
       printType,
       frameId,
       price,
-    };
-    setCart(prev => [...prev, item]);
-    setCartOpen(true);
-  }, [title, subtitle, sizeId, orientation, themeId, theme, focusId, locations, printType, frameId]);
+    });
+  }, [title, subtitle, sizeId, orientation, themeId, theme, focusId, locations, printType, frameId, addToCart]);
 
   const handleRemoveFromCart = useCallback((index) => {
-    setCart(prev => prev.filter((_, i) => i !== index));
-  }, []);
+    removeFromCart(index);
+  }, [removeFromCart]);
 
   const handleExport = useCallback(async () => {
     setIsExporting(true);
