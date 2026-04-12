@@ -204,7 +204,7 @@ export default function App() {
         <AuthModal user={user} onUserChange={setUser} onClose={() => setAuthOpen(false)} />
       )}
       {cartOpen && (
-        <CartDrawer cart={cart} onClose={() => setCartOpen(false)} onRemove={handleRemoveFromCart} />
+        <CartDrawer cart={cart} onClose={() => setCartOpen(false)} onRemove={handleRemoveFromCart} user={user} />
       )}
     </div>
   );
