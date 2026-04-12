@@ -11,14 +11,14 @@ export default function LandingPage() {
   return (
     <div className="flex h-screen overflow-hidden font-inter select-none">
 
-      {/* ── MERIDIAN wordmark — floats above both halves ── */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-center pt-7 pointer-events-none">
-        <div className="flex items-baseline gap-3">
-          <span className="font-playfair text-sm tracking-[0.35em] text-white/80 uppercase mix-blend-difference">
-            Meridian
+      {/* ── MERIDIAN wordmark — top left ── */}
+      <div className="absolute top-0 left-0 z-30 flex items-center pt-6 pl-7 pointer-events-none">
+        <div className="flex items-baseline gap-2">
+          <span className="font-playfair text-sm tracking-[0.25em] text-white/80 mix-blend-difference">
+            Meridian.ai
           </span>
-          <span className="text-[9px] tracking-[0.3em] text-white/40 uppercase mix-blend-difference">
-            Poster Studio
+          <span className="text-[9px] tracking-[0.2em] text-white/40 uppercase mix-blend-difference font-inter">
+            Travel Poster Studio
           </span>
         </div>
       </div>
