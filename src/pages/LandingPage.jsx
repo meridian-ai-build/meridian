@@ -81,16 +81,13 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center">
-            <div className="text-[9px] tracking-[0.4em] text-blue-300/50 uppercase mb-3 font-inter">
-              Path One
-            </div>
             <h2 className="font-playfair text-white leading-none mb-4"
               style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 500 }}>
               Travel<br />Map
             </h2>
             <div className="w-8 h-px bg-blue-300/30 mx-auto mb-4" />
             <p className="text-blue-100/40 font-inter leading-relaxed"
-              style={{ fontSize: 'clamp(0.65rem, 1.1vw, 0.8rem)', letterSpacing: '0.12em', textTransform: 'uppercase', maxWidth: '18ch' }}>
+              style={{ fontSize: 'clamp(0.65rem, 1.1vw, 0.8rem)', letterSpacing: '0.12em', textTransform: 'uppercase', maxWidth: '18ch', textAlign: 'center' }}>
               Every place you've ever been, beautifully mapped.
             </p>
           </div>
@@ -160,16 +157,13 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center">
-            <div className="text-[9px] tracking-[0.4em] text-amber-900/40 uppercase mb-3 font-inter">
-              Path Two
-            </div>
             <h2 className="font-playfair text-amber-950 leading-none mb-4"
               style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 500 }}>
               Single<br />Print
             </h2>
             <div className="w-8 h-px bg-amber-900/25 mx-auto mb-4" />
             <p className="text-amber-900/50 font-inter leading-relaxed"
-              style={{ fontSize: 'clamp(0.65rem, 1.1vw, 0.8rem)', letterSpacing: '0.12em', textTransform: 'uppercase', maxWidth: '18ch' }}>
+              style={{ fontSize: 'clamp(0.65rem, 1.1vw, 0.8rem)', letterSpacing: '0.12em', textTransform: 'uppercase', maxWidth: '18ch', textAlign: 'center' }}>
               One place. One memory. One print.
             </p>
           </div>

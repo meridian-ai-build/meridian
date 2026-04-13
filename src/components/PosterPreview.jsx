@@ -1,7 +1,7 @@
 import WorldMap from './WorldMap';
 import { getAspectRatio } from '../utils/posterSizes';
 
-function PosterPreview({ locations, theme, title, subtitle, yearFrom, yearTo, mapRef, showLines, sizeId, orientation, projectionConfig, focusId, frameShadow }) {
+function PosterPreview({ locations, theme, title, subtitle, yearFrom, yearTo, yearMode, mapRef, showLines, sizeId, orientation, projectionConfig, focusId, frameShadow }) {
   const uniqueCountries = new Set(locations.map(l => l.country).filter(Boolean)).size;
   const uniqueContinents = new Set(locations.map(l => l.continent).filter(Boolean)).size;
   const hasData = locations.length > 0;
@@ -112,7 +112,13 @@ function PosterPreview({ locations, theme, title, subtitle, yearFrom, yearTo, ma
             <div style={{ width: 1, height: 32, backgroundColor: theme.posterDivider }} />
             <StatBlock value={hasData ? uniqueContinents : '—'} label="Continents" theme={theme} titleFont={titleFont} bodyFont={bodyFont} />
             <div style={{ width: 1, height: 32, backgroundColor: theme.posterDivider }} />
-            <StatBlock value={yearFrom && yearTo ? `${yearFrom}–${yearTo}` : '—'} label="Years" theme={theme} titleFont={titleFont} bodyFont={bodyFont} />
+            <StatBlock
+              value={yearMode === 'single'
+                ? (yearFrom || '—')
+                : (yearFrom && yearTo ? `${yearFrom}–${yearTo}` : '—')}
+              label={yearMode === 'single' ? 'Year' : 'Years'}
+              theme={theme} titleFont={titleFont} bodyFont={bodyFont}
+            />
           </div>
         </div>
 

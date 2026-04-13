@@ -21,6 +21,7 @@ export default function App() {
   const [orientation, setOrientation] = useState('portrait');
   const [focusId, setFocusId] = useState(DEFAULT_FOCUS_ID);
   const [locations, setLocations] = useState([]);
+  const [yearMode, setYearMode] = useState('range');
   const [isExporting, setIsExporting] = useState(false);
   const [showLines, setShowLines] = useState(true);
   const [printType, setPrintType] = useState('digital');
@@ -118,6 +119,7 @@ export default function App() {
         subtitle={subtitle} setSubtitle={setSubtitle}
         yearFrom={yearFrom} setYearFrom={setYearFrom}
         yearTo={yearTo} setYearTo={setYearTo}
+        yearMode={yearMode} setYearMode={setYearMode}
         theme={themeId} setTheme={setThemeId}
         sizeId={sizeId} setSizeId={setSizeId}
         orientation={orientation} setOrientation={setOrientation}
@@ -188,6 +190,7 @@ export default function App() {
             subtitle={subtitle}
             yearFrom={yearFrom}
             yearTo={yearTo}
+            yearMode={yearMode}
             showLines={showLines}
             sizeId={sizeId}
             orientation={orientation}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SinglePrintPreview from '../components/SinglePrintPreview';
 import CartDrawer from '../components/CartDrawer';
 import { useCart } from '../context/CartContext';
-import { FRAME_OPTIONS, PRINT_TYPES, FRAME_SHADOWS, calculatePrice } from '../utils/pricing';
+import { FRAME_OPTIONS, FRAME_SHADOWS, SINGLE_PRINT_SIZES, calculateSinglePrintPrice } from '../utils/pricing';
 
 const STYLES = [
   { id: 'vintage',   label: 'Vintage',   desc: 'Film grain · Serif · Warm tones' },
@@ -28,33 +28,44 @@ const FILM_VARIANTS = [
   { id: '16mm', label: '16mm' },
 ];
 
+const PRINT_TYPES = [
+  { id: 'digital', label: 'Digital Download', desc: 'High-res PNG · Instant delivery' },
+  { id: 'print',   label: 'Print & Ship',     desc: 'Pro print · Shipped to you' },
+];
+
 const FRAME_SWATCH = { none: null, black: '#1d1d1d', white: '#ede9e3', oak: '#a87945' };
 
+const SQUARE_SIZES  = SINGLE_PRINT_SIZES.filter(s => s.shape === 'square');
+const RECT_SIZES    = SINGLE_PRINT_SIZES.filter(s => s.shape === 'rectangle');
+
 export default function SinglePrint() {
-  const [location, setLocation]     = useState('');
-  const [region, setRegion]         = useState('');
-  const [date, setDate]             = useState('');
-  const [quote, setQuote]           = useState('');
-  const [photoUrl, setPhotoUrl]     = useState(null);
-  const [style, setStyle]           = useState('vintage');
+  const [location, setLocation]       = useState('');
+  const [region, setRegion]           = useState('');
+  const [date, setDate]               = useState('');
+  const [quote, setQuote]             = useState('');
+  const [photoUrl, setPhotoUrl]       = useState(null);
+  const [style, setStyle]             = useState('vintage');
   const [filmVariant, setFilmVariant] = useState('35mm');
-  const [fontIndex, setFontIndex]   = useState(0);
-  const [frameId, setFrameId]       = useState('none');
-  const [printType, setPrintType]   = useState('digital');
+  const [fontIndex, setFontIndex]     = useState(0);
+  const [frameId, setFrameId]         = useState('none');
+  const [printType, setPrintType]     = useState('digital');
+  const [sizeId, setSizeId]           = useState('rc-8x10');
+  const [textPosition, setTextPosition] = useState('below');
 
   const { cart, cartOpen, setCartOpen, addToCart, removeFromCart } = useCart();
   const fileRef = useRef(null);
 
   const font = STYLE_FONTS[style]?.[fontIndex] ?? STYLE_FONTS[style]?.[0];
   const isFramed = frameId !== 'none';
+  const currentSize = SINGLE_PRINT_SIZES.find(s => s.id === sizeId) ?? SINGLE_PRINT_SIZES[0];
+  const aspectRatio = `${currentSize.w}/${currentSize.h}`;
+  const price = calculateSinglePrintPrice(sizeId, printType, frameId);
 
-  // When style changes, reset font index
   const handleStyleChange = useCallback((s) => {
     setStyle(s);
     setFontIndex(0);
   }, []);
 
-  // Photo upload
   const handlePhotoChange = useCallback((e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -64,21 +75,20 @@ export default function SinglePrint() {
   }, []);
 
   const handleAddToCart = useCallback(() => {
-    const price = calculatePrice(printType, frameId);
-    const styleColors = { vintage: { bg: '#12101a', accent: '#c9a857' }, cinematic: { bg: '#040408', accent: '#e53935' }, editorial: { bg: '#f5f0e8', accent: '#1a1410' } };
+    const styleColors = {
+      vintage:   { bg: '#12101a', accent: '#c9a857' },
+      cinematic: { bg: '#040408', accent: '#e53935' },
+      editorial: { bg: '#f5f0e8', accent: '#1a1410' },
+    };
     addToCart({
       type: 'single-print',
       title: location || 'Single Print',
-      location,
-      region,
-      date,
-      quote,
-      photoUrl,
-      style,
-      filmVariant,
-      font,
-      frameId,
-      printType,
+      location, region, date, quote, photoUrl,
+      style, filmVariant, font,
+      frameId, printType,
+      sizeId,
+      sizeLabel: currentSize.label,
+      textPosition,
       price,
       themeColors: {
         posterBg: styleColors[style].bg,
@@ -87,7 +97,7 @@ export default function SinglePrint() {
         pinColor: styleColors[style].accent,
       },
     });
-  }, [location, region, date, quote, photoUrl, style, filmVariant, font, frameId, printType, addToCart]);
+  }, [location, region, date, quote, photoUrl, style, filmVariant, font, frameId, printType, sizeId, currentSize, textPosition, price, addToCart]);
 
   const frameShadow = FRAME_SHADOWS[frameId];
 
@@ -226,14 +236,51 @@ export default function SinglePrint() {
                     }`}
                   >
                     <div>
-                      <div className={`text-xs font-inter font-medium ${style === s.id ? 'text-white/90' : 'text-white/45'}`}>
-                        {s.label}
-                      </div>
-                      <div className={`text-[10px] font-inter ${style === s.id ? 'text-white/35' : 'text-white/18'}`}>
-                        {s.desc}
-                      </div>
+                      <div className={`text-xs font-inter font-medium ${style === s.id ? 'text-white/90' : 'text-white/45'}`}>{s.label}</div>
+                      <div className={`text-[10px] font-inter ${style === s.id ? 'text-white/35' : 'text-white/18'}`}>{s.desc}</div>
                     </div>
                     {style === s.id && <div className="w-1.5 h-1.5 rounded-full bg-white/60 flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Text Position */}
+            <section>
+              <Label className="mb-2">Text Position</Label>
+              <div className="flex gap-2">
+                {[
+                  { id: 'below',   label: 'Below Photo',   icon: '▬\n─' },
+                  { id: 'overlay', label: 'Over Photo',    icon: '─\n▬' },
+                ].map(tp => (
+                  <button
+                    key={tp.id}
+                    onClick={() => setTextPosition(tp.id)}
+                    className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded border text-[10px] font-inter transition-all ${
+                      textPosition === tp.id
+                        ? 'border-white/35 bg-white/[0.08] text-white/80'
+                        : 'border-white/[0.07] text-white/30 hover:border-white/18 hover:text-white/50'
+                    }`}
+                  >
+                    {/* Mini poster diagram */}
+                    <div className="flex flex-col gap-0.5 w-6">
+                      {tp.id === 'below' ? (
+                        <>
+                          <div className={`h-3 rounded-sm ${textPosition === tp.id ? 'bg-white/30' : 'bg-white/10'}`} />
+                          <div className={`h-1.5 rounded-sm ${textPosition === tp.id ? 'bg-white/50' : 'bg-white/20'}`} />
+                          <div className={`h-1 w-3/4 rounded-sm ${textPosition === tp.id ? 'bg-white/30' : 'bg-white/12'}`} />
+                        </>
+                      ) : (
+                        <>
+                          <div className="relative h-5 rounded-sm overflow-hidden">
+                            <div className={`absolute inset-0 ${textPosition === tp.id ? 'bg-white/20' : 'bg-white/08'}`} />
+                            <div className={`absolute bottom-0 left-0 right-0 h-1.5 ${textPosition === tp.id ? 'bg-white/50' : 'bg-white/20'}`} />
+                          </div>
+                          <div className={`h-1 w-3/4 rounded-sm ${textPosition === tp.id ? 'bg-white/30' : 'bg-white/12'}`} />
+                        </>
+                      )}
+                    </div>
+                    {tp.label}
                   </button>
                 ))}
               </div>
@@ -281,6 +328,51 @@ export default function SinglePrint() {
               </div>
             </section>
 
+            {/* Print Size */}
+            <section>
+              <Label className="mb-3">Print Size</Label>
+
+              {/* Square group */}
+              <div className="mb-3">
+                <div className="text-[9px] text-white/25 font-inter tracking-[0.2em] uppercase mb-1.5">Square</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {SQUARE_SIZES.map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSizeId(s.id)}
+                      className={`px-2.5 py-1.5 rounded border text-[11px] font-inter transition-all ${
+                        sizeId === s.id
+                          ? 'border-white/40 bg-white/[0.1] text-white/90'
+                          : 'border-white/[0.08] text-white/35 hover:border-white/20 hover:text-white/55'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rectangle group */}
+              <div>
+                <div className="text-[9px] text-white/25 font-inter tracking-[0.2em] uppercase mb-1.5">Rectangle</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {RECT_SIZES.map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSizeId(s.id)}
+                      className={`px-2.5 py-1.5 rounded border text-[11px] font-inter transition-all ${
+                        sizeId === s.id
+                          ? 'border-white/40 bg-white/[0.1] text-white/90'
+                          : 'border-white/[0.08] text-white/35 hover:border-white/20 hover:text-white/55'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
             {/* Frame */}
             <section>
               <Label className="mb-2">Frame</Label>
@@ -324,11 +416,8 @@ export default function SinglePrint() {
                     <span className={`text-[11px] font-inter font-medium ${printType === pt.id ? 'text-white/90' : 'text-white/50'}`}>
                       {pt.label}
                     </span>
-                    <span className={`text-[10px] font-inter ${printType === pt.id ? 'text-white/50' : 'text-white/25'}`}>
-                      ${pt.price}
-                    </span>
                     <span className={`text-[9px] font-inter leading-tight ${printType === pt.id ? 'text-white/35' : 'text-white/18'}`}>
-                      {pt.description}
+                      {pt.desc}
                     </span>
                   </button>
                 ))}
@@ -348,14 +437,16 @@ export default function SinglePrint() {
                   : 'bg-white text-black hover:bg-white/90 active:scale-[0.98]'
               }`}
             >
-              Add to Cart · ${calculatePrice(printType, frameId)}
+              Add to Cart · ${price}
             </button>
+            <p className="text-center text-white/15 text-[9px] font-inter mt-2">
+              {currentSize.label} · {printType === 'print' ? 'Print & Ship' : 'Digital Download'}
+            </p>
           </div>
         </aside>
 
         {/* ── Preview area ── */}
         <main className="flex-1 flex items-center justify-center overflow-hidden bg-[#171720] relative">
-          {/* Dot grid */}
           <div className="absolute inset-0 opacity-[0.025] pointer-events-none"
             style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
 
@@ -373,6 +464,8 @@ export default function SinglePrint() {
               filmVariant={filmVariant}
               font={font}
               frameShadow={frameShadow}
+              textPosition={textPosition}
+              aspectRatio={aspectRatio}
             />
           </div>
         </main>
